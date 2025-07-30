@@ -1,0 +1,27 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd
+           http://www.springframework.org/schema/mvc 
+           http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+    <!-- Enable component scanning -->
+    <context:component-scan base-package="project.ATLdeliveryNote.Controller" />
+
+    <!-- Enable @RequestBody, @ResponseBody, and auto message converters -->
+    <mvc:annotation-driven />
+
+    <!-- Optional: View resolver for JSP -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+
+    <!-- Optional: manually register Jackson converter -->
+    <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+</beans>
