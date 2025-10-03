@@ -35,11 +35,11 @@ public class DeliveryNoteController {
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String allowLogin() {
-		return "login";
+		return "redirect:/resources/index.html";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/update/{id}", method = RequestMethod.PUT, consumes = "application/json")
+	@RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
 	public ResponseEntity<String> updateDelivery(@RequestBody DeliveryNote updatedDelivery, @PathVariable("id") Long id) {
 
 		 DeliveryNote note = service.getDeliveryById(id);

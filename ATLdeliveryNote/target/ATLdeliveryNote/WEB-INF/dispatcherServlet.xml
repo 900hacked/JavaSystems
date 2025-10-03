@@ -13,14 +13,17 @@
     <!-- Enable component scanning -->
     <context:component-scan base-package="project.ATLdeliveryNote.Controller" />
 
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+    <mvc:resources mapping="/images/**" location="/images/" />
+
     <!-- Enable @RequestBody, @ResponseBody, and auto message converters -->
     <mvc:annotation-driven />
 
     <!-- Optional: View resolver for JSP -->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/pages/" />
-        <property name="suffix" value=".jsp" />
-    </bean>
+<!--    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+<!--        <property name="prefix" value="/WEB-INF/pages/" />-->
+<!--        <property name="suffix" value=".jsp" />-->
+<!--    </bean>-->
 
     <!-- Optional: manually register Jackson converter -->
     <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />

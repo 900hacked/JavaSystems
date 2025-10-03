@@ -13,6 +13,11 @@
          <context:component-scan base-package="project.ATLdeliveryNote.controller" />
  
 	<http auto-config="true"  use-expressions="true">
+		<intercept-url pattern="/resources/**" access="permitAll"/>
+		<intercept-url pattern="/index.html" access="permitAll"/>
+		<intercept-url pattern="/style.css" access="permitAll"/>
+		<intercept-url pattern="/login.js" access="permitAll"/>
+		<intercept-url pattern="/images/**" access="permitAll"/>
 		<intercept-url pattern="/products/add**" access="hasAuthority('ROLE_USER')" />
 		<intercept-url pattern="/products/update**" access="hasAuthority('ROLE_USER')" />
 		<intercept-url pattern="/delivery/add**" access="hasAuthority('ROLE_USER')" />
@@ -21,14 +26,15 @@
 		<intercept-url pattern="/" access="permitAll"/>
 		<intercept-url pattern="/products/login" access="permitAll"/>
 		<intercept-url pattern="/" access="permitAll"/>
+		<intercept-url pattern="/ATLdeliveryNote/**" access="permitAll"/>
 		<intercept-url pattern="/**" access="hasAuthority('ROLE_USER')" />
 		
  
 		<form-login 
-		    login-page="/products/login" 
+		    login-page="/index.html"
 		    login-processing-url="/j_spring_security_check"
-		    default-target-url="/products/add" 
-			authentication-failure-url="/login?error" 
+		    default-target-url="/products/gets"
+			authentication-failure-url="/index.html?error"
 			username-parameter="username"
 			password-parameter="password" />
 		<logout logout-success-url="/login?logout"  />

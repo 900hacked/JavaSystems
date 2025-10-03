@@ -25,7 +25,7 @@ public class ProductController {
 	private ProductService service;
 	
 	@ResponseBody
-	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
+	@RequestMapping(value = "/add", method = RequestMethod.POST)
 	public String addProducts(@RequestBody Product product ) {
 		
 		service.addProduct(product);
@@ -35,11 +35,11 @@ public class ProductController {
 	
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String allowLogin() {
-		return "login";
+		return "redirect:/resources/index.html";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value = "/update/{id}", method = RequestMethod.PUT, consumes = "application/json")
+	@RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
 	public String updateProducts(@RequestBody Product updatedProduct, @PathVariable("id") Long id) {
 
 		Product prod = service.getProductsById(id);

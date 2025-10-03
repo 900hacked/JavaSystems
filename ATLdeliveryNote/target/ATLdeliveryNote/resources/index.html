@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/ATLdeliveryNote/resources/style.css" />
+    <title>Login</title>
+    <link rel="icon" type="image/x-icon" href="/ATLdeliveryNote/images/favicon.ico" />
+</head>
+
+<body>
+<h1>Springs Investment LTD</h1>
+<div id="login">
+    <h2>login</h2>
+    <form id="loginForm" action="j_spring_security_check" method="post">
+        <input type="text" name="username" placeholder="Username" required />
+        <p></p>
+        <input type="password" name="password" placeholder="Password" required />
+        <p></p>
+        <button type="submit">Login</button>
+        <div id="loginMessage"></div>
+    </form>
+</div>
+
+<script src="/ATLdeliveryNote/resources/login.js"></script>
+</body>
+</html>
