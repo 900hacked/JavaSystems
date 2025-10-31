@@ -1,0 +1,95 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body{
+    background-color: #252c37;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding-top: 80px;
+    color: #fff;
+}
+
+h1{
+    text-align: center;
+    color: #f8c61e;
+    position: fixed;
+    top: 30px;
+    font-size: 28px;
+    letter-spacing: 2px;
+}
+
+.table-container{
+    width: 85%;
+    max-width: 900px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    color: #fff;
+    font-size: 15px;
+}
+
+thead{
+    background: linear-gradient(135deg, #f8c61e, #e0a800);
+    color: #252c37;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+th, td{
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+
+tr:hover{
+    background: rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+}
+
+button{
+    padding: 6px 14px;
+    margin: 2px;
+    border: none;
+    border-radius: px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button.edit {
+    background: linear-gradient(135deg, #f8c61e, #e0a800);
+    color: #fff;
+}
+
+button.delete {
+    background: linear-gradient(135deg, #ff4d4d, #d11a1a);
+    color: #fff;
+}
+
+button.edit:hover{
+    background: linear-gradient(135deg,#ffde59, #f8c61e );
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+button.delete:hover{
+    background: linear-gradient(135deg,#ff6666, #ff3333 );
+    transform: scale(1.05);
+    opacity: 0.9;
+}

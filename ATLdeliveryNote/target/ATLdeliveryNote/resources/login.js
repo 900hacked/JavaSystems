@@ -19,43 +19,38 @@ const body = new URLSearchParams();
 body.append('username', username);
 body.append('password', password);
 
+// compute contextPath reliably
 const contextPath = window.location.pathname.split('/')[1] ? '/' + window.location.pathname.split('/')[1] : '';
-const url = contextPath + '/j_spring_security_check';
 
+try {
+  const res = await fetch(contextPath + '/j_spring_security_check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    credentials: 'same-origin',
+    body: body.toString(),
+    redirect: 'follow'
+  });
 
-try{
-const res = await fetch(url, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-},
-credentials: 'same-origin',
-body: body.toString(),
-redirect: 'follow'
-});
+  // if server redirected to our /products/front controller it may show in res.url,
+  // but to be deterministic we redirect the browser client-side to the static page:
+  if (res.ok) {
+    window.location.href = contextPath + '/resources/productsGets.html';
+    return;
+  }
 
-const finalUrl = res.url || '';
+  // handle failed login
+  const finalUrl = res.url || '';
+  if (finalUrl.includes('error=true') || res.status === 401 || res.status === 403) {
+    showmsg('Invalid username or password', true);
+    return;
+  }
 
-if (finalUrl.includes('/products')){
-window.location.href = '/products/gets';
-return;
-}
+  const text = await res.text().catch(() => '');
+  showmsg('Login failed: ' + res.status + ' ' + text, true);
 
-if (finalUrl.includes('/login') && finalUrl.includes('error')){
-showmsg('Invalid username or password', true);
-return;
-}
-
-if (!res.ok){
-const text = await res.text().catch(() => '');
-showmsg('Login failed: ' + res.status + ' ' + text, true);
-return;
-}
-
-window.location.href = contextPath + '/products/gets';
-} catch(err){
-console.error('login error', err);
-showmsg('Network error while logging in', true);
+} catch (err) {
+  console.error('login error', err);
+  showmsg('Network error while logging in', true);
 }
 
 });

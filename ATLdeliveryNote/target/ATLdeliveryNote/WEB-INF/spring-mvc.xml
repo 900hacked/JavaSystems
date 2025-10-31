@@ -24,6 +24,9 @@
 <!--			<property name="prefix" value="/WEB-INF/pages/" />-->
 <!--			<property name="suffix" value=".jsp" />-->
 <!--		</bean>-->
+
+	<mvc:resources mapping="/resources/**" location="/resources/"/>
+	<mvc:resources mapping="/images/**" location="/images/" />
  
 		<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"
 			id="dataSource">
