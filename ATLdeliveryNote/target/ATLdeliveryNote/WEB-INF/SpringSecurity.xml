@@ -1,60 +1,56 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	   xmlns:sec="http://www.springframework.org/schema/security"
-	   xmlns:context="http://www.springframework.org/schema/context"
-	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	   xsi:schemaLocation="
-           http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context.xsd
-           http://www.springframework.org/schema/security
-           http://www.springframework.org/schema/security/spring-security-4.2.xsd">
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd">
 
-	<!-- Scan your controllers -->
-	<context:component-scan base-package="project.ATLdeliveryNote.controller"/>
+	<!-- Scan your controllers (scan root package so controllers are found) -->
+	<context:component-scan base-package="project.ATLdeliveryNote" />
 
 	<!-- NullRequestCache bean -->
 	<bean id="nullRequestCache"
-		  class="org.springframework.security.web.savedrequest.NullRequestCache"/>
+		class="org.springframework.security.web.savedrequest.NullRequestCache" />
 
 	<!-- Security configuration -->
 	<sec:http auto-config="true" use-expressions="true">
 		<!-- Public URLs -->
-		<sec:intercept-url pattern="/resources/**" access="permitAll"/>
-		<sec:intercept-url pattern="/images/**" access="permitAll"/>
-		<sec:intercept-url pattern="/style.css" access="permitAll"/>
-		<sec:intercept-url pattern="/login.js" access="permitAll"/>
-		<sec:intercept-url pattern="/index.html" access="permitAll"/>
-		<sec:intercept-url pattern="/" access="permitAll"/>
+		<sec:intercept-url pattern="/resources/**" access="permitAll" />
+		<sec:intercept-url pattern="/images/**" access="permitAll" />
+		<sec:intercept-url pattern="/style.css" access="permitAll" />
+		<sec:intercept-url pattern="/login.js" access="permitAll" />
+		<sec:intercept-url pattern="/index.html" access="permitAll" />
+		<sec:intercept-url pattern="/" access="permitAll" />
 
 		<!-- Protected URLs -->
-		<sec:intercept-url pattern="/products/**" access="hasRole('ROLE_USER')"/>
-		<sec:intercept-url pattern="/delivery/**" access="hasRole('ROLE_USER')"/>
+		<sec:intercept-url pattern="/products/**" access="hasRole('ROLE_USER')" />
+		<sec:intercept-url pattern="/delivery/**" access="hasRole('ROLE_USER')" />
 
 		<!-- Request cache -->
-		<sec:request-cache ref="nullRequestCache"/>
+		<sec:request-cache ref="nullRequestCache" />
 
 		<!-- Login configuration -->
 		<sec:form-login login-page="/resources/index.html"
-						login-processing-url="/j_spring_security_check"
-						default-target-url="/products/front"
-						authentication-failure-url="/resources/index.html?error=true"
-						username-parameter="username"
-						password-parameter="password"/>
+			login-processing-url="/j_spring_security_check"
+			default-target-url="/products/front"
+			authentication-failure-url="/resources/index.html?error=true"
+			username-parameter="username"
+			password-parameter="password" />
 
 		<!-- Logout configuration -->
-		<sec:logout logout-success-url="/resources/index.html?logout=true"/>
+		<sec:logout logout-success-url="/resources/index.html?logout=true" />
 
 		<!-- Disable CSRF -->
-		<sec:csrf disabled="true"/>
+		<sec:csrf disabled="true" />
 	</sec:http>
 
 	<!-- JDBC authentication -->
 	<sec:authentication-manager>
 		<sec:authentication-provider>
 			<sec:jdbc-user-service data-source-ref="dataSource"
-								   users-by-username-query="SELECT username, password, enables FROM users WHERE username = ?"
-								   authorities-by-username-query="SELECT username, authority FROM authorities WHERE username = ?"/>
+				users-by-username-query="SELECT username, password, enables FROM users WHERE username = ?"
+				authorities-by-username-query="SELECT username, authority FROM authorities WHERE username = ?" />
 		</sec:authentication-provider>
 	</sec:authentication-manager>
 

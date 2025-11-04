@@ -119,4 +119,70 @@ ${product.description}
       alert("Network error while deleting product.");
     }
   }
+
+  // SEARCH FEATURE
+  searchBtn.addEventListener("click", async() => {
+  const query = searchInput.value.trim();
+  if(!query){
+  alert("Please enter a product name to search.");
+  return;
+  }
+
+  tableBody.innerHTML = '<tr><td colspan="4">Searching...</td></tr>';
+
+  try {
+        const response = await fetch(`${baseUrl}/products/search/${encodeURIComponent(query)}`);
+        if (response.status === 204) {
+          tableBody.innerHTML = '<tr><td colspan="4">No products found.</td></tr>';
+          return;
+        }
+
+        if (!response.ok) {
+          tableBody.innerHTML = `<tr><td colspan="4">Search failed (Error ${response.status})</td></tr>`;
+          return;
+        }
+
+        const results = await response.json();
+              renderTable(results);
+            } catch (error) {
+              console.error("Search error:", error);
+              tableBody.innerHTML = '<tr><td colspan="4">Network error during search.</td></tr>';
+            }
+  });
+
+  resetBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      loadProducts();
+    });
+
+    // --- ADD PRODUCT FEATURE ---
+      addBtn.addEventListener("click", async () => {
+        const name = addName.value.trim();
+        const desc = addDesc.value.trim();
+
+        if (!name || !desc) {
+          alert("Both name and description are required.");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${baseUrl}/products/add`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productName: name, description: desc }),
+          });
+
+          if (response.ok) {
+            alert("Product added successfully!");
+            addName.value = "";
+            addDesc.value = "";
+            loadProducts();
+          } else {
+            alert("Failed to add product. Status: " + response.status);
+          }
+        } catch (error) {
+          console.error("Add error:", error);
+          alert("Network error while adding product.");
+        }
+      });
 });
