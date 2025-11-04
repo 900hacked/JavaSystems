@@ -212,4 +212,79 @@ ${product.description}
       }
     });
   }
+
+  const selectedProducts = [];
+  const selectedListContainer = document.createElement("div");
+  selectedListContainer.className = "delivery-summary";
+  selectedListContainer.innerHTML = `
+    <h2>Selected Products</h2>
+    <ul id="selectedProducts"></ul>
+    <button id="generateDeliveryBtn">Generate Delivery Note</button>
+  `;
+  document.body.appendChild(selectedListContainer);
+
+  const selectedList = document.getElementById("selectedProducts");
+  const generateBtn = document.getElementById("generateDeliveryBtn");
+
+  // Add "Select" buttons to each product row dynamically
+  document.addEventListener("click", (e) => {
+    if (e.target && e.target.classList.contains("select")) {
+      const row = e.target.closest("tr");
+      const id = row.children[0].textContent;
+      const name = row.children[1].textContent;
+
+      const qty = prompt(`Enter quantity for ${name}:`);
+      if (!qty || isNaN(qty) || qty <= 0) {
+        alert("Please enter a valid quantity.");
+        return;
+      }
+
+      const existing = selectedProducts.find((p) => p.id === id);
+      if (existing) {
+        existing.quantity = parseInt(qty);
+      } else {
+        selectedProducts.push({ id: parseInt(id), name, quantity: parseInt(qty) });
+      }
+
+      updateSelectedList();
+    }
+  });
+
+  function updateSelectedList() {
+    selectedList.innerHTML = "";
+    selectedProducts.forEach((p) => {
+      const li = document.createElement("li");
+      li.textContent = `${p.name} — ${p.quantity}`;
+      selectedList.appendChild(li);
+    });
+  }
+
+  // Send selected products to /delivery/add
+  generateBtn.addEventListener("click", async () => {
+    if (!selectedProducts.length) {
+      alert("No products selected!");
+      return;
+    }
+
+    for (const product of selectedProducts) {
+      try {
+        const response = await fetch(`${baseUrl}/delivery/add`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product: { id: product.id },
+            quantity: product.quantity,
+            serialNumber: "AUTO-" + Date.now(), // simple serial example
+          }),
+        });
+
+        if (!response.ok) throw new Error(`Failed to add delivery for ${product.name}`);
+      } catch (err) {
+        console.error(err);
+        alert(err.message);
+      }
+    }
+
+    alert("Delivery note generated!");
+    window.location.href = `${baseUrl}/delivery/front`; // redirect to delivery page
 });

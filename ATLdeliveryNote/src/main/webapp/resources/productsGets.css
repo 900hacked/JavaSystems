@@ -141,7 +141,47 @@ button.edit:hover, button.delete:hover {
   opacity: 0.9;
 }
 
-/* FOOTER */
+
+.delivery-summary {
+  margin-top: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.delivery-summary h2 {
+  color: #f8c61e;
+  margin-bottom: 10px;
+}
+
+#selectedProducts {
+  list-style: none;
+  margin-bottom: 20px;
+}
+
+#selectedProducts li {
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 8px;
+  border-radius: 8px;
+}
+
+#generateDeliveryBtn {
+  background: linear-gradient(135deg, #5ec25e, #3ea03e);
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#generateDeliveryBtn:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
 footer {
   margin-top: auto;
   padding: 15px;
