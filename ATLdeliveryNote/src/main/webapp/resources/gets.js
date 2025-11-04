@@ -6,6 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
     : "";
   const baseUrl = window.location.origin + contextPath;
 
+  // UI elements (may be absent in some pages; guard before use)
+  const searchBtn = document.querySelector("#searchBtn");
+  const searchInput = document.querySelector("#searchInput");
+  const resetBtn = document.querySelector("#resetBtn");
+  const addBtn = document.querySelector("#addBtn");
+  const addName = document.querySelector("#addName");
+  const addDesc = document.querySelector("#addDesc");
+
   loadProducts();
 
   async function loadProducts() {
@@ -30,12 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      tableBody.innerHTML = "";
+      // render products into table
+      renderProducts(products);
+    } catch (error) {
+      console.error("Error loading products: ", error);
+      tableBody.innerHTML =
+        '<tr><td colspan = "4">Network error while loading products.</td></tr>';
+    }
+  }
 
-      products.forEach((product) => {
-        const row = document.createElement("tr");
+  // Helper to render product list into tableBody
+  function renderProducts(products) {
+    tableBody.innerHTML = "";
 
-        row.innerHTML = `
+    products.forEach((product) => {
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
 <td>${product.id}</td>
 <td>${product.productName}</td>
 <td class = "description" title="${product.description}">
@@ -47,20 +66,16 @@ ${product.description}
 </td>
 `;
 
-        tableBody.appendChild(row);
-      });
+      tableBody.appendChild(row);
+    });
 
-      document
-        .querySelectorAll(".edit")
-        .forEach((btn) => btn.addEventListener("click", handleEdit));
-      document
-        .querySelectorAll(".delete")
-        .forEach((btn) => btn.addEventListener("click", handleDelete));
-    } catch (error) {
-      console.error("Error loading products: ", error);
-      tableBody.innerHTML =
-        '<tr><td colspan = "4">Network error while loading products.</td></tr>';
-    }
+    // attach handlers
+    document
+      .querySelectorAll(".edit")
+      .forEach((btn) => btn.addEventListener("click", handleEdit));
+    document
+      .querySelectorAll(".delete")
+      .forEach((btn) => btn.addEventListener("click", handleDelete));
   }
 
   async function handleEdit(e) {
@@ -121,19 +136,25 @@ ${product.description}
   }
 
   // SEARCH FEATURE
-  searchBtn.addEventListener("click", async() => {
-  const query = searchInput.value.trim();
-  if(!query){
-  alert("Please enter a product name to search.");
-  return;
-  }
+  if (searchBtn && searchInput) {
+    searchBtn.addEventListener("click", async () => {
+      const query = searchInput.value.trim();
+      if (!query) {
+        alert("Please enter a product name to search.");
+        return;
+      }
 
-  tableBody.innerHTML = '<tr><td colspan="4">Searching...</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="4">Searching...</td></tr>';
 
-  try {
-        const response = await fetch(`${baseUrl}/products/search/${encodeURIComponent(query)}`);
+      try {
+        const response = await fetch(
+          `${baseUrl}/products/search/${encodeURIComponent(query)}`,
+          { credentials: "same-origin" }
+        );
+
         if (response.status === 204) {
-          tableBody.innerHTML = '<tr><td colspan="4">No products found.</td></tr>';
+          tableBody.innerHTML =
+            '<tr><td colspan="4">No products found.</td></tr>';
           return;
         }
 
@@ -143,46 +164,52 @@ ${product.description}
         }
 
         const results = await response.json();
-              renderTable(results);
-            } catch (error) {
-              console.error("Search error:", error);
-              tableBody.innerHTML = '<tr><td colspan="4">Network error during search.</td></tr>';
-            }
-  });
+        renderProducts(results);
+      } catch (error) {
+        console.error("Search error:", error);
+        tableBody.innerHTML =
+          '<tr><td colspan="4">Network error during search.</td></tr>';
+      }
+    });
+  }
 
-  resetBtn.addEventListener("click", () => {
+  if (resetBtn && searchInput) {
+    resetBtn.addEventListener("click", () => {
       searchInput.value = "";
       loadProducts();
     });
+  }
 
-    // --- ADD PRODUCT FEATURE ---
-      addBtn.addEventListener("click", async () => {
-        const name = addName.value.trim();
-        const desc = addDesc.value.trim();
+  // --- ADD PRODUCT FEATURE ---
+  if (addBtn && addName && addDesc) {
+    addBtn.addEventListener("click", async () => {
+      const name = addName.value.trim();
+      const desc = addDesc.value.trim();
 
-        if (!name || !desc) {
-          alert("Both name and description are required.");
-          return;
+      if (!name || !desc) {
+        alert("Both name and description are required.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${baseUrl}/products/add`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productName: name, description: desc }),
+        });
+
+        if (response.ok) {
+          alert("Product added successfully!");
+          addName.value = "";
+          addDesc.value = "";
+          loadProducts();
+        } else {
+          alert("Failed to add product. Status: " + response.status);
         }
-
-        try {
-          const response = await fetch(`${baseUrl}/products/add`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ productName: name, description: desc }),
-          });
-
-          if (response.ok) {
-            alert("Product added successfully!");
-            addName.value = "";
-            addDesc.value = "";
-            loadProducts();
-          } else {
-            alert("Failed to add product. Status: " + response.status);
-          }
-        } catch (error) {
-          console.error("Add error:", error);
-          alert("Network error while adding product.");
-        }
-      });
+      } catch (error) {
+        console.error("Add error:", error);
+        alert("Network error while adding product.");
+      }
+    });
+  }
 });
