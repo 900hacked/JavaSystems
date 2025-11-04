@@ -1,9 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.querySelector("#productsTable tbody");
-  // compute contextPath reliably (same approach used in login.js)
-  const contextPath = window.location.pathname.split("/")[1]
-    ? "/" + window.location.pathname.split("/")[1]
-    : "";
+  // compute contextPath: prefer server-provided value (set in HTML), then meta tag, then fallback
+  const contextFromWindow =
+    typeof window.contextPath === "string" ? window.contextPath : null;
+  const meta = document.querySelector('meta[name="context-path"]');
+  const contextFromMeta = meta ? meta.getAttribute("content") : null;
+  let contextPath = "";
+  if (contextFromWindow) contextPath = contextFromWindow;
+  else if (contextFromMeta) contextPath = contextFromMeta;
+  else {
+    // fallback: if webapp deployed under a first path segment that is not 'products' or 'resources'
+    const first = window.location.pathname.split("/")[1];
+    if (first && first !== "products" && first !== "resources")
+      contextPath = "/" + first;
+  }
   const baseUrl = window.location.origin + contextPath;
 
   // UI elements (may be absent in some pages; guard before use)
@@ -61,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 ${product.description}
 </td>
 <td>
+<button class ="select" data-id="${product.id}">Select</button>
 <button class ="edit" data-id="${product.id}">Edit</button>
 <button class ="delete" data-id="${product.id}">Delete</button>
 </td>
@@ -214,14 +225,18 @@ ${product.description}
   }
 
   const selectedProducts = [];
-  const selectedListContainer = document.createElement("div");
-  selectedListContainer.className = "delivery-summary";
-  selectedListContainer.innerHTML = `
-    <h2>Selected Products</h2>
-    <ul id="selectedProducts"></ul>
-    <button id="generateDeliveryBtn">Generate Delivery Note</button>
-  `;
-  document.body.appendChild(selectedListContainer);
+  // If a delivery-summary element exists in the HTML use it, otherwise create it
+  let selectedListContainer = document.querySelector(".delivery-summary");
+  if (!selectedListContainer) {
+    selectedListContainer = document.createElement("div");
+    selectedListContainer.className = "delivery-summary";
+    selectedListContainer.innerHTML = `
+      <h2>Selected Products</h2>
+      <ul id="selectedProducts"></ul>
+      <button id="generateDeliveryBtn">Generate Delivery Note</button>
+    `;
+    document.body.appendChild(selectedListContainer);
+  }
 
   const selectedList = document.getElementById("selectedProducts");
   const generateBtn = document.getElementById("generateDeliveryBtn");
@@ -239,11 +254,12 @@ ${product.description}
         return;
       }
 
-      const existing = selectedProducts.find((p) => p.id === id);
+      const numericId = parseInt(id);
+      const existing = selectedProducts.find((p) => p.id === numericId);
       if (existing) {
         existing.quantity = parseInt(qty);
       } else {
-        selectedProducts.push({ id: parseInt(id), name, quantity: parseInt(qty) });
+        selectedProducts.push({ id: numericId, name, quantity: parseInt(qty) });
       }
 
       updateSelectedList();
@@ -251,6 +267,7 @@ ${product.description}
   });
 
   function updateSelectedList() {
+    if (!selectedList) return;
     selectedList.innerHTML = "";
     selectedProducts.forEach((p) => {
       const li = document.createElement("li");
@@ -260,31 +277,36 @@ ${product.description}
   }
 
   // Send selected products to /delivery/add
-  generateBtn.addEventListener("click", async () => {
-    if (!selectedProducts.length) {
-      alert("No products selected!");
-      return;
-    }
-
-    for (const product of selectedProducts) {
-      try {
-        const response = await fetch(`${baseUrl}/delivery/add`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            product: { id: product.id },
-            quantity: product.quantity,
-            serialNumber: "AUTO-" + Date.now(), // simple serial example
-          }),
-        });
-
-        if (!response.ok) throw new Error(`Failed to add delivery for ${product.name}`);
-      } catch (err) {
-        console.error(err);
-        alert(err.message);
+  if (generateBtn) {
+    generateBtn.addEventListener("click", async () => {
+      if (!selectedProducts.length) {
+        alert("No products selected!");
+        return;
       }
-    }
 
-    alert("Delivery note generated!");
-    window.location.href = `${baseUrl}/delivery/front`; // redirect to delivery page
+      for (const product of selectedProducts) {
+        try {
+          const response = await fetch(`${baseUrl}/delivery/add`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({
+              product: { id: product.id },
+              quantity: product.quantity,
+              serialNumber: "AUTO-" + Date.now(), // simple serial example
+            }),
+          });
+
+          if (!response.ok)
+            throw new Error(`Failed to add delivery for ${product.name}`);
+        } catch (err) {
+          console.error(err);
+          alert(err.message);
+        }
+      }
+
+      alert("Delivery note generated!");
+      window.location.href = `${baseUrl}/delivery/front`; // redirect to delivery page
+    });
+  }
 });
