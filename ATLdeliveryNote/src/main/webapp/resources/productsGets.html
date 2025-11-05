@@ -1,53 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Ensure assets resolve correctly when page is served from /products/front -->
     <link rel="stylesheet" href="/ATLdeliveryNote/resources/productsGets.css" />
-    <script>window.contextPath = '/ATLdeliveryNote';</script>
+    <script>
+      window.contextPath = "/ATLdeliveryNote";
+    </script>
     <title>Gets</title>
-</head>
-<body>
-<h1>Products List</h1>
+  </head>
+  <body>
+    <h1>Products List</h1>
 
-<div class="controls">
-    <div class="search-section">
-        <input type="text" id="searchInput" placeholder="Search product by name..."/>
+    <div class="controls">
+      <div class="search-section">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search product by name..."
+        />
         <button id="searchBtn">Search</button>
         <button id="resetBtn">Reset</button>
-    </div>
+      </div>
 
-    <div class="add-section">
-        <input type="text" id="addName" placeholder="Product name"/>
-        <input type="text" id="addDesc" placeholder="Description"/>
+      <div class="add-section">
+        <input type="text" id="addName" placeholder="Product name" />
+        <input type="text" id="addDesc" placeholder="Description" />
         <button id="addBtn">Add Product</button>
+      </div>
     </div>
-</div>
 
-<div class="table-container">
-    <table id="productsTable">
+    <div class="table-container">
+      <table id="productsTable">
         <thead>
-        <tr>
+          <tr>
             <th>ID</th>
             <th>Product Name</th>
             <th>Description</th>
             <th>Actions</th>
-        </tr>
+          </tr>
         </thead>
-        <tbody>
+        <tbody></tbody>
+      </table>
+    </div>
 
+    <div class="delivery-summary">
+      <h2>Selected Products</h2>
+      <ul id="selectedProducts"></ul>
+      <button id="generateDeliveryBtn">Generate Delivery Note</button>
+    </div>
 
-        </tbody>
-    </table>
-</div>
-
-<div class="delivery-summary">
-    <h2>Selected Products</h2>
-    <ul id="selectedProducts"></ul>
-    <button id="generateDeliveryBtn">Generate Delivery Note</button>
-</div>
-
-<script src="/ATLdeliveryNote/resources/gets.js"></script>
-</body>
+    <script src="/ATLdeliveryNote/resources/gets.js"></script>
+  </body>
 </html>

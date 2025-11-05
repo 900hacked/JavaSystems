@@ -19,20 +19,19 @@ import project.ATLdeliveryNote.Service.DeliveryNoteService;
 @Controller
 @RequestMapping("/delivery")
 public class DeliveryNoteController {
-	
+
 	@Autowired
 	private DeliveryNoteService service;
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<String> addDelivery(@RequestBody DeliveryNote delivery ) {
-		 
-		
+	public ResponseEntity<String> addDelivery(@RequestBody DeliveryNote delivery) {
+
 		service.addDelivery(delivery);
-		
+
 		return ResponseEntity.ok("Successfully added Delivery");
 	}
-	
+
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String allowLogin() {
 		return "redirect:/resources/index.html";
@@ -42,84 +41,83 @@ public class DeliveryNoteController {
 	public String frontDelivery() {
 		return "forward:/resources/delivery/delivery.html";
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<String> updateDelivery(@RequestBody DeliveryNote updatedDelivery, @PathVariable("id") Long id) {
+	public ResponseEntity<String> updateDelivery(@RequestBody DeliveryNote updatedDelivery,
+			@PathVariable("id") Long id) {
 
-		 DeliveryNote note = service.getDeliveryById(id);
-		    if (note != null) {
-		        note.setProduct(updatedDelivery.getProduct());
-		        note.setQuantity(updatedDelivery.getQuantity());
-		        service.updateDelivery(note);
-		        return ResponseEntity.ok("Successfully Updated");
-		    } else {
-		        return ResponseEntity.notFound().build();
-		    }
-		
+		DeliveryNote note = service.getDeliveryById(id);
+		if (note != null) {
+			note.setProduct(updatedDelivery.getProduct());
+			note.setQuantity(updatedDelivery.getQuantity());
+			service.updateDelivery(note);
+			return ResponseEntity.ok("Successfully Updated");
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
 	public ResponseEntity<DeliveryNoteDTO> getDeliveryById(@PathVariable("id") Long id) {
-		 DeliveryNote note = service.getDeliveryById(id);
+		DeliveryNote note = service.getDeliveryById(id);
 		if (note == null) {
-	        return ResponseEntity.notFound().build();
-	    }
+			return ResponseEntity.notFound().build();
+		}
 
-	    Product product = note.getProduct();
+		Product product = note.getProduct();
 
-	    DeliveryNoteDTO dto = new DeliveryNoteDTO(
-	        note.getId(),
-	        note.getQuantity(),
-	        note.getSerialNumber(),
-	        product.getProductName(),
-	        product.getDescription()
-	    );
+		DeliveryNoteDTO dto = new DeliveryNoteDTO(
+				note.getId(),
+				note.getQuantity(),
+				note.getSerialNumber(),
+				product.getProductName(),
+				product.getDescription());
 
-	    return ResponseEntity.ok(dto);
+		return ResponseEntity.ok(dto);
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/getSerial/{serialNumber}", method = RequestMethod.GET)
 	public ResponseEntity<DeliveryNoteDTO> getDeliveryBySerialNo(@PathVariable("serialNumber") String serialNumber) {
-        DeliveryNote note = service.getDeliveryBySerialNo(serialNumber);
+		DeliveryNote note = service.getDeliveryBySerialNo(serialNumber);
 
-        if (note == null) {
-            return ResponseEntity.notFound().build();
-        }
+		if (note == null) {
+			return ResponseEntity.notFound().build();
+		}
 
-        Product product = note.getProduct(); 
+		Product product = note.getProduct();
 
-        DeliveryNoteDTO dto = new DeliveryNoteDTO(
-            note.getId(),
-            note.getQuantity(),
-            note.getSerialNumber(),
-            product.getProductName(),
-            product.getDescription()
-        );
+		DeliveryNoteDTO dto = new DeliveryNoteDTO(
+				note.getId(),
+				note.getQuantity(),
+				note.getSerialNumber(),
+				product.getProductName(),
+				product.getDescription());
 
-        return ResponseEntity.ok(dto);
+		return ResponseEntity.ok(dto);
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
 	public ResponseEntity<String> removeDelivery(@PathVariable("id") Long id) {
-		
-		 DeliveryNote note = service.getDeliveryById(id);
 
-	        if (note == null) {
-	            return ResponseEntity.notFound().build();
-	        }
+		DeliveryNote note = service.getDeliveryById(id);
 
-	        service.removeDelivery(id);
-	        return ResponseEntity.ok("Delivery " + id + " has been deleted");
+		if (note == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		service.removeDelivery(id);
+		return ResponseEntity.ok("Delivery " + id + " has been deleted");
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/gets", method = RequestMethod.GET)
-	public ResponseEntity<List<DeliveryNote>> getAll(){
-		
+	public ResponseEntity<List<DeliveryNote>> getAll() {
+
 		return ResponseEntity.ok(service.listDelivery());
 	}
 

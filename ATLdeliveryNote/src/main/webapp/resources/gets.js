@@ -305,8 +305,9 @@ ${product.description}
         }
       }
 
-      alert("Delivery note generated!");
-      window.location.href = `${baseUrl}/delivery/front`; // redirect to delivery page
+    alert("Delivery note generated!");
+    // Redirect to delivery controller endpoint which forwards to delivery.html
+    window.location.href = `${baseUrl}/delivery/note`;
     });
   }
 });
