@@ -17,13 +17,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const baseUrl = window.location.origin + contextPath;
 
   loadDeliveries();
+  let currentNotes = [];
 
   async function loadDeliveries() {
     tableBody.innerHTML =
-      '<tr><td colspan="4">Loading delivery notes...</td></tr>';
+      '<tr><td colspan="5">Loading delivery notes...</td></tr>';
 
     try {
-      const response = await fetch(`${baseUrl}/delivery/gets`, {
+      // If a serial query param exists, request only that batch
+      const params = new URLSearchParams(window.location.search);
+      const serial = params.get("serial");
+      const endpoint = serial
+        ? `${baseUrl}/delivery/bySerial/${encodeURIComponent(serial)}`
+        : `${baseUrl}/delivery/gets`;
+      const response = await fetch(endpoint, {
         method: "GET",
         credentials: "same-origin",
       });
@@ -34,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const notes = await response.json();
+      currentNotes = notes;
 
       if (!notes || notes.length === 0) {
         tableBody.innerHTML =
@@ -52,13 +60,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderDeliveries(notes) {
     tableBody.innerHTML = "";
     notes.forEach((note) => {
-      const product = note.product || {};
+      // support both DeliveryNote entity shape (note.product) and DTO shape (productName/description)
+      const productName = note.product
+        ? note.product.productName
+        : note.productName;
+      const description = note.product
+        ? note.product.description
+        : note.description;
       const row = document.createElement("tr");
       row.innerHTML = `
-          <td>${product.productName || "—"}</td>
-          <td>${product.description || "—"}</td>
+          <td>${productName || "—"}</td>
+          <td>${description || "—"}</td>
           <td>${note.quantity}</td>
           <td>${note.serialNumber}</td>
+          <td><button class="del-note" data-id="${note.id}">Delete</button></td>
         `;
       tableBody.appendChild(row);
     });
@@ -95,6 +110,50 @@ document.addEventListener("DOMContentLoaded", () => {
   if (backBtn) {
     backBtn.addEventListener("click", () => {
       window.location.href = `${baseUrl}/resources/productsGets.html`;
+    });
+  }
+
+  // Delete single delivery note from list
+  document.addEventListener("click", async (e) => {
+    if (e.target && e.target.classList.contains("del-note")) {
+      const id = e.target.dataset.id;
+      const ok = confirm("Delete this delivery item?");
+      if (!ok) return;
+      try {
+        const res = await fetch(`${baseUrl}/delivery/delete/${id}`, {
+          method: "DELETE",
+          credentials: "same-origin",
+        });
+        if (res.ok) {
+          alert("Deleted");
+          loadDeliveries();
+        } else throw new Error("Delete failed");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete: " + err.message);
+      }
+    }
+  });
+
+  // Delete all notes currently shown
+  const deleteAllDeliveries = document.getElementById("deleteAllDeliveries");
+  if (deleteAllDeliveries) {
+    deleteAllDeliveries.addEventListener("click", async () => {
+      const ok = confirm("Delete ALL currently shown delivery notes?");
+      if (!ok) return;
+      try {
+        for (const n of currentNotes) {
+          await fetch(`${baseUrl}/delivery/delete/${n.id}`, {
+            method: "DELETE",
+            credentials: "same-origin",
+          });
+        }
+        alert("Deleted all shown deliveries");
+        loadDeliveries();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete all: " + err.message);
+      }
     });
   }
 

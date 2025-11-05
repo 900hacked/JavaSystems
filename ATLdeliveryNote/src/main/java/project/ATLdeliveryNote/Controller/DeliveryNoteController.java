@@ -1,6 +1,7 @@
 package project.ATLdeliveryNote.Controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -119,6 +120,22 @@ public class DeliveryNoteController {
 	public ResponseEntity<List<DeliveryNote>> getAll() {
 
 		return ResponseEntity.ok(service.listDelivery());
+	}
+
+	// Return delivery notes that share the same serial number (used to show a batch)
+	@ResponseBody
+	@RequestMapping(value = "/bySerial/{serial}", method = RequestMethod.GET)
+	public ResponseEntity<List<DeliveryNoteDTO>> getBySerial(@PathVariable("serial") String serial) {
+		List<DeliveryNote> all = service.listDelivery();
+		List<DeliveryNoteDTO> dtos = all.stream()
+				.filter(n -> serial != null && serial.equals(n.getSerialNumber()))
+				.map(n -> {
+					Product p = n.getProduct();
+					return new DeliveryNoteDTO(n.getId(), n.getQuantity(), n.getSerialNumber(), p.getProductName(), p.getDescription());
+				})
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(dtos);
 	}
 
 }
