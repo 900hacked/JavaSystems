@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="delivery.css" />
+    <title>Delivery Note</title>
+
+</head>
+
+<body>
+<div class="container">
+    <h1>Your Delivery Note</h1>
+    <p class="subtitle">Here’s a summary of the items you’ve selected.</p>
+
+    <div class="table-container">
+        <table id="deliveryTable">
+            <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Serial No</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Rows will be dynamically inserted -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="actions">
+        <button id="resetBtn"> Pick Again</button>
+        <button id="confirmBtn"> Confirm & Finish</button>
+    </div>
+</div>
+
+<script src="delivery.js"></script>
+</body>
+</html>

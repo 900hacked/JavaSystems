@@ -37,6 +37,11 @@ public class DeliveryNoteController {
 	public String allowLogin() {
 		return "redirect:/resources/index.html";
 	}
+
+	@RequestMapping(value = "/note", method = RequestMethod.GET)
+	public String frontDelivery() {
+		return "forward:/resources/delivery/delivery.html";
+	}
 	
 	@ResponseBody
 	@RequestMapping(value = "/update/{id}", method = RequestMethod.PUT)
