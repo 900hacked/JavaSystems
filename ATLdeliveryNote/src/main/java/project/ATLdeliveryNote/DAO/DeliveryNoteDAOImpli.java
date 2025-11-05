@@ -22,7 +22,11 @@ public class DeliveryNoteDAOImpli implements DeliveryNoteDAO {
 		// If the client provided a serialNumber (e.g. batch id from frontend), keep it.
 		// Otherwise generate a new serial in the ATL#### format.
 		String provided = delivery.getSerialNumber();
-		if (provided == null || provided.trim().isEmpty()) {
+		// If client didn't provide a serial or provided the temporary AUTO-... batch
+		// id,
+		// generate a server-side ATL serial. If client already provided an ATL... id,
+		// preserve it.
+		if (provided == null || provided.trim().isEmpty() || provided.startsWith("AUTO-")) {
 			// Get the latest serial number from the DB
 			String lastSerial = (String) session.createQuery(
 					"SELECT d.serialNumber FROM DeliveryNote d ORDER BY d.id DESC")
@@ -41,7 +45,15 @@ public class DeliveryNoteDAOImpli implements DeliveryNoteDAO {
 				}
 			}
 
-			String newSerial = String.format("ATL%04d", nextNumber);
+			// Use 3-digit padding for numbers below 1000 (e.g. ATL001). For >=1000 produce
+			// ATL1000, ATL1001, etc.
+			String newSerial;
+			if (nextNumber < 1000) {
+				newSerial = String.format("ATL%03d", nextNumber);
+			} else {
+				newSerial = "ATL" + nextNumber;
+			}
+
 			delivery.setSerialNumber(newSerial);
 		} else {
 			// preserve the client-provided serial (trim whitespace)

@@ -69,8 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
         : note.description;
       const row = document.createElement("tr");
       row.innerHTML = `
-          <td>${productName || "—"}</td>
-          <td>${description || "—"}</td>
+          <td>${productName || "-"}</td>
+          <td>${description || "-"}</td>
           <td>${note.quantity}</td>
           <td>${note.serialNumber}</td>
           <td><button class="del-note" data-id="${note.id}">Delete</button></td>
