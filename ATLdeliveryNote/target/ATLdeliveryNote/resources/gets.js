@@ -271,8 +271,8 @@ ${product.description}
     if (!selectedList) return;
     selectedList.innerHTML = "";
     selectedProducts.forEach((p) => {
-      const li = document.createElement("li");
-      li.textContent = `${p.name} — ${p.quantity}`;
+  const li = document.createElement("li");
+  li.textContent = `${p.name} - ${p.quantity}`;
       selectedList.appendChild(li);
     });
   }

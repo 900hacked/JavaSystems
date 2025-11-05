@@ -26,7 +26,12 @@ public class DeliveryNoteDAOImpli implements DeliveryNoteDAO {
 		// id,
 		// generate a server-side ATL serial. If client already provided an ATL... id,
 		// preserve it.
-		if (provided == null || provided.trim().isEmpty() || provided.startsWith("AUTO-")) {
+		if (provided != null && provided.trim().startsWith("AUTO")) {
+			provided = null;
+			delivery.setSerialNumber(null);
+		}
+
+		if (provided == null || provided.trim().isEmpty()) {
 			// Get the latest serial number from the DB
 			String lastSerial = (String) session.createQuery(
 					"SELECT d.serialNumber FROM DeliveryNote d ORDER BY d.id DESC")

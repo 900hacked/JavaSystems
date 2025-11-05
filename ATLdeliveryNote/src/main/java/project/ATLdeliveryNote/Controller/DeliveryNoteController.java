@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,11 +28,15 @@ public class DeliveryNoteController {
 
 	@ResponseBody
 	@RequestMapping(value = "/add", method = RequestMethod.POST, consumes = "application/json")
-	public ResponseEntity<String> addDelivery(@RequestBody DeliveryNote delivery) {
+	public ResponseEntity<Map<String, String>> addDelivery(@RequestBody DeliveryNote delivery) {
 
 		service.addDelivery(delivery);
 
-		return ResponseEntity.ok("Successfully added Delivery");
+		// After persisting, delivery should have its serialNumber set. Return it so the
+		// frontend can use the authoritative serial (especially when server generates it).
+		Map<String, String> resp = new HashMap<>();
+		resp.put("serial", delivery.getSerialNumber());
+		return ResponseEntity.ok(resp);
 	}
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
