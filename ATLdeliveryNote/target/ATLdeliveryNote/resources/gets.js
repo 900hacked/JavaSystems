@@ -272,7 +272,7 @@ ${product.description}
     selectedList.innerHTML = "";
     selectedProducts.forEach((p) => {
   const li = document.createElement("li");
-  li.textContent = `${p.name} - ${p.quantity}`;
+  li.textContent = `${sanitizeText(p.name)} - ${p.quantity}`;
       selectedList.appendChild(li);
     });
   }
@@ -285,35 +285,57 @@ ${product.description}
         return;
       }
 
-      // Use a single batch serial for all items in this delivery
-      const batchSerial = "AUTO-" + Date.now();
-      for (const product of selectedProducts) {
+      // Create a server-generated batch serial by posting the first item and
+      // using the returned serial for the rest of the items. This avoids the
+      // DAO generating different ATL serials per item when frontend used AUTO-...
+      let batchSerial = null;
+      for (let i = 0; i < selectedProducts.length; i++) {
+        const product = selectedProducts[i];
         try {
+          // For the first item we can send a temporary AUTO id; server will
+          // generate an ATL serial and return it in the response.
+          const payload = {
+            product: { id: product.id },
+            quantity: product.quantity,
+            serialNumber: i === 0 ? "AUTO-" + Date.now() : batchSerial,
+          };
+
           const response = await fetch(`${baseUrl}/delivery/add`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "same-origin",
-            body: JSON.stringify({
-              product: { id: product.id },
-              quantity: product.quantity,
-              serialNumber: batchSerial,
-            }),
+            body: JSON.stringify(payload),
           });
 
-          if (!response.ok)
-            throw new Error(`Failed to add delivery for ${product.name}`);
+          if (!response.ok) throw new Error(`Failed to add delivery for ${product.name}`);
+
+          // read returned json (controller now returns { serial: 'ATL...' })
+          const json = await response.json();
+          if (!batchSerial && json && json.serial) {
+            batchSerial = json.serial;
+          }
         } catch (err) {
           console.error(err);
           alert(err.message);
         }
       }
 
+      if (!batchSerial) {
+        alert('Failed to determine batch serial from server. Delivery may be incomplete.');
+        return;
+      }
+
       alert("Delivery note generated!");
-      // Redirect to delivery controller endpoint which forwards to delivery.html and include batch serial
-      window.location.href = `${baseUrl}/delivery/note?serial=${encodeURIComponent(
-        batchSerial
-      )}`;
+      // Redirect to delivery controller endpoint which forwards to delivery.html and include server serial
+      window.location.href = `${baseUrl}/delivery/note?serial=${encodeURIComponent(batchSerial)}`;
     });
+  }
+
+  // sanitize text that may have been mojibaked due to encoding issues
+  function sanitizeText(s) {
+    if (!s) return s;
+    // Fix common windows-1252 -> utf-8 mojibake for em-dash and similar characters
+    return s.replace(/â€”/g, '—').replace(/â€“/g, '–');
   }
 
     // Delete all products (useful for cleaning test data)

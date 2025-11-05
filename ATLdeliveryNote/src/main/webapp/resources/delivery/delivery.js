@@ -61,8 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
     tableBody.innerHTML = "";
     notes.forEach((note) => {
       // support both DeliveryNote entity shape (note.product) and DTO shape (productName/description)
-      const productName = note.product ? note.product.productName : note.productName;
-      const description = note.product ? note.product.description : note.description;
+      const productName = note.product
+        ? note.product.productName
+        : note.productName;
+      const description = note.product
+        ? note.product.description
+        : note.description;
       const productNameSafe = sanitizeText(productName) || "—";
       const descriptionSafe = sanitizeText(description) || "—";
       const row = document.createElement("tr");
@@ -77,10 +81,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // sanitize text in case of encoding issues
+  // sanitize text in case of encoding issues (only replace known mojibake sequences)
   function sanitizeText(s) {
-    if (!s) return s;
-    return s.replace(/â€”/g, '—').replace(/â€“/g, '–');
+    if (s == null) return s;
+    // If the string doesn't contain any suspicious sequences, return as-is.
+    if (!/[âÃ]/.test(s)) return s;
+
+    // Replace a few common mojibake patterns (em-dash, en-dash, ellipsis, common accented letters)
+    return s
+      .replace(/â€”/g, "—")
+      .replace(/â€“/g, "–")
+      .replace(/â€¦/g, "…")
+      .replace(/Ã©/g, "é")
+      .replace(/Ã¨/g, "è")
+      .replace(/Ã¡/g, "á")
+      .replace(/Ã¶/g, "ö")
+      .replace(/Ã¼/g, "ü")
+      .replace(/Ã§/g, "ç");
   }
 
   resetBtn.addEventListener("click", async () => {

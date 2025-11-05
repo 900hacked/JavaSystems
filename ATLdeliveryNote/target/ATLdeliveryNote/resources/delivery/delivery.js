@@ -61,16 +61,14 @@ document.addEventListener("DOMContentLoaded", () => {
     tableBody.innerHTML = "";
     notes.forEach((note) => {
       // support both DeliveryNote entity shape (note.product) and DTO shape (productName/description)
-      const productName = note.product
-        ? note.product.productName
-        : note.productName;
-      const description = note.product
-        ? note.product.description
-        : note.description;
+      const productName = note.product ? note.product.productName : note.productName;
+      const description = note.product ? note.product.description : note.description;
+      const productNameSafe = sanitizeText(productName) || "—";
+      const descriptionSafe = sanitizeText(description) || "—";
       const row = document.createElement("tr");
       row.innerHTML = `
-          <td>${productName || "-"}</td>
-          <td>${description || "-"}</td>
+          <td>${productNameSafe}</td>
+          <td>${descriptionSafe}</td>
           <td>${note.quantity}</td>
           <td>${note.serialNumber}</td>
           <td><button class="del-note" data-id="${note.id}">Delete</button></td>
@@ -78,6 +76,15 @@ document.addEventListener("DOMContentLoaded", () => {
       tableBody.appendChild(row);
     });
   }
+
+  // sanitize text in case of encoding issues
+//function sanitizeText(s) {
+//  if (!s) return s;
+//  if (s.includes("â")) {
+//    return s.replace(/â€”/g, '—').replace(/â€“/g, '–');
+//  }
+//  return s;
+//}
 
   resetBtn.addEventListener("click", async () => {
     const confirmReset = confirm(
