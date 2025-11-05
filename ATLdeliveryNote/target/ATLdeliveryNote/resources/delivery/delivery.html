@@ -1,42 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/ATLdeliveryNote/resources/delivery/delivery.css" />
-    <script>window.contextPath = '/ATLdeliveryNote';</script>
+    <link
+      rel="stylesheet"
+      href="/ATLdeliveryNote/resources/delivery/delivery.css"
+    />
+    <script>
+      window.contextPath = "/ATLdeliveryNote";
+    </script>
     <title>Delivery Note</title>
+  </head>
 
-</head>
+  <body>
+    <div class="container">
+      <h1>Your Delivery Note</h1>
+      <p class="subtitle">Here’s a summary of the items you’ve selected.</p>
 
-<body>
-<div class="container">
-    <h1>Your Delivery Note</h1>
-    <p class="subtitle">Here’s a summary of the items you’ve selected.</p>
-
-    <div class="table-container">
+      <div class="table-container">
         <table id="deliveryTable">
-            <thead>
+          <thead>
             <tr>
-                <th>Product Name</th>
-                <th>Description</th>
-                <th>Quantity</th>
-                <th>Serial No</th>
+              <th>Product Name</th>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Serial No</th>
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             <!-- Rows will be dynamically inserted -->
-            </tbody>
+          </tbody>
         </table>
+      </div>
+
+      <div class="actions">
+        <button id="backBtn">Back</button>
+        <button id="resetBtn">Pick Again</button>
+        <button id="deleteAllDeliveries">Delete All</button>
+        <button id="confirmBtn">Confirm & Finish</button>
+      </div>
     </div>
 
-    <div class="actions">
-        <button id="backBtn"> Back</button>
-        <button id="resetBtn"> Pick Again</button>
-        <button id="confirmBtn"> Confirm & Finish</button>
-    </div>
-</div>
-
-<script src="/ATLdeliveryNote/resources/delivery/delivery.js"></script>
-</body>
+    <script src="/ATLdeliveryNote/resources/delivery/delivery.js"></script>
+  </body>
 </html>

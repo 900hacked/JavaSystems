@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.querySelector("#addBtn");
   const addName = document.querySelector("#addName");
   const addDesc = document.querySelector("#addDesc");
+  const deleteAllBtn = document.querySelector("#deleteAllBtn");
 
   loadProducts();
 
@@ -284,6 +285,8 @@ ${product.description}
         return;
       }
 
+      // Use a single batch serial for all items in this delivery
+      const batchSerial = "AUTO-" + Date.now();
       for (const product of selectedProducts) {
         try {
           const response = await fetch(`${baseUrl}/delivery/add`, {
@@ -293,7 +296,7 @@ ${product.description}
             body: JSON.stringify({
               product: { id: product.id },
               quantity: product.quantity,
-              serialNumber: "AUTO-" + Date.now(), // simple serial example
+              serialNumber: batchSerial,
             }),
           });
 
@@ -305,9 +308,33 @@ ${product.description}
         }
       }
 
-    alert("Delivery note generated!");
-    // Redirect to delivery controller endpoint which forwards to delivery.html
-    window.location.href = `${baseUrl}/delivery/note`;
+      alert("Delivery note generated!");
+      // Redirect to delivery controller endpoint which forwards to delivery.html and include batch serial
+      window.location.href = `${baseUrl}/delivery/note?serial=${encodeURIComponent(
+        batchSerial
+      )}`;
     });
   }
+
+    // Delete all products (useful for cleaning test data)
+    if (deleteAllBtn) {
+      deleteAllBtn.addEventListener("click", async () => {
+        const confirmDel = confirm("Delete ALL products from database? This cannot be undone.");
+        if (!confirmDel) return;
+
+        try {
+          const res = await fetch(`${baseUrl}/products/gets`, { credentials: "same-origin" });
+          if (!res.ok) throw new Error("Failed to list products");
+          const products = await res.json();
+          for (const p of products) {
+            await fetch(`${baseUrl}/products/delete/${p.id}`, { method: "DELETE", credentials: "same-origin" });
+          }
+          alert('All products deleted.');
+          loadProducts();
+        } catch (err) {
+          console.error('Delete all error', err);
+          alert('Failed to delete all products: ' + err.message);
+        }
+      });
+    }
 });
